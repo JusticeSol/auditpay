@@ -79,6 +79,7 @@ export default function Home() {
   const [scheme, setScheme] = useState<BatchEvmScheme | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<{ review: string; metadata: any } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [statsRefresh, setStatsRefresh] = useState(0);
@@ -105,13 +106,15 @@ export default function Home() {
     setPaying(true);
     setResult(null);
     try {
+      setAnalyzing(true);
       const data = await payAndFetch(scheme, code);
       setResult(data);
-      setStatsRefresh((n) => n + 1);
+      setStatsRefresh((n) => n + 1); 
     } catch (e: any) {
       setError(e.message || "Payment or review failed");
     } finally {
       setPaying(false);
+      setAnalyzing(false);
     }
   }
 
@@ -121,7 +124,10 @@ export default function Home() {
       <header className="border-b border-[#20252C] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-[#3ECF8E] shadow-[0_0_8px_#3ECF8E]" />
-          <span className="font-mono text-sm tracking-tight text-[#E8E6E1]">AuditPay</span>
+          <span className="font-mono text-sm font-semibold tracking-tight">
+            <span className="text-[#E8E6E1]">Audit</span>
+            <span className="text-[#FFB020]">Pay</span>
+          </span>
           <span className="font-mono text-[10px] text-[#5B6270] border border-[#2A2F37] rounded px-1.5 py-0.5">
             Arc Testnet
           </span>
@@ -207,6 +213,13 @@ export default function Home() {
         {error && (
           <div className="mt-4 rounded border border-[#FF6B5C]/30 bg-[#FF6B5C]/5 px-4 py-3 text-sm text-[#FF6B5C] font-mono">
             {error}
+          </div>
+        )}
+
+        {analyzing && !result && (
+          <div className="mt-10 flex items-center gap-3 font-mono text-sm text-[#8B92A0]">
+            <span className="inline-block w-2 h-4 bg-[#3ECF8E] animate-pulse" />
+            <span>Analyzing contract...</span>
           </div>
         )}
 
