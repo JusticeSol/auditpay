@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import StatsBar from "./StatsBar";
 import { connectWallet, payAndFetch } from "@/lib/walletBrowser";
 import type { BatchEvmScheme } from "@circle-fin/x402-batching/client";
 
@@ -80,6 +81,7 @@ export default function Home() {
   const [paying, setPaying] = useState(false);
   const [result, setResult] = useState<{ review: string; metadata: any } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [statsRefresh, setStatsRefresh] = useState(0);
 
   const liveEstimate = useMemo(() => estimatePrice(code), [code]);
 
@@ -105,6 +107,7 @@ export default function Home() {
     try {
       const data = await payAndFetch(scheme, code);
       setResult(data);
+      setStatsRefresh((n) => n + 1);
     } catch (e: any) {
       setError(e.message || "Payment or review failed");
     } finally {
@@ -147,6 +150,10 @@ export default function Home() {
             Paste a contract. The price scales with functions, modifiers, and inheritance.
             Pay per call in USDC — no subscription, no API key.
           </p>
+        </div>
+
+        <div className="mb-8">
+          <StatsBar refreshKey={statsRefresh} />
         </div>
 
         {/* Terminal window */}

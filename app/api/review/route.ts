@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { recordPayment } from "@/lib/stats";
 import {
   facilitator,
   buildPaymentRequirements,
@@ -131,6 +132,16 @@ export async function POST(req: NextRequest) {
 
     const payer = settleResult.payer ?? verifyResult.payer ?? "unknown";
     console.log(`[x402] Payment settled: ${endpoint} — ${price} USDC from ${payer}`);
+
+    // Record traction metrics (non-blocking — never breaks the review flow)
+    await recordPayment({
+      payer,
+      amountMicro: Math.round(parseFloat(price.replace("$", "")) * 1_000_000),
+      price,
+      functionCount: countFunctions(code),
+      transaction: settleResult.transaction ?? "unknown",
+      timestamp: new Date().toISOString(),
+    });
 
     const review = await runReview(code);
 
