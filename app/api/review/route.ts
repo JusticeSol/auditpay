@@ -61,7 +61,9 @@ Format your response as:
 ## Summary
 [brief overall assessment]
 
-Be concise but thorough. If no issues found in a category, say "None found."`,
+Be concise but thorough. If no issues found in a category, say "None found."
+
+If the contract contains no security vulnerabilities, begin the Summary with a clear verdict: "✓ This contract appears SAFE — no security vulnerabilities detected." Only give this verdict when there are genuinely no security issues; minor style or documentation suggestions do not disqualify a safe verdict.`,
       messages: [{ role: "user", content: `Review this Solidity contract:\n\n${code}` }],
     }),
   });
